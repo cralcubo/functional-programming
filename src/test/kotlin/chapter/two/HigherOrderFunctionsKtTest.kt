@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 
-class ListExtensionsKtTest {
+class HigherOrderFunctionsKtTest {
 
     @Test
     fun isSorted() {
