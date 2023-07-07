@@ -1,7 +1,13 @@
 package chapter.three
 
+import chapter.three.List.Companion.empty
+import chapter.three.List.Companion.foldRight
 import java.lang.RuntimeException
 
+/**
+ * This a simple Linked List data structure
+ * This linked list is an Algebraic Data Structure
+ */
 sealed class List<out A> {
     companion object {
         fun <A> of(vararg aa: A): List<A> {
@@ -10,6 +16,12 @@ sealed class List<out A> {
                 else -> Cons(aa.first(), of(*aa.sliceArray(1 until aa.size)))
             }
         }
+
+        fun <A> concat(xxs: List<List<A>>): List<A> =
+            foldRight(
+                xxs,
+                empty()
+            ) { xs1, xs2 -> append(xs1, xs2) }
 
         fun <A> empty(): List<A> = Nil
 
@@ -39,6 +51,10 @@ sealed class List<out A> {
                 is Cons -> Cons(a1.head, append(a1.tail, a2))
             }
 
+        fun <A> appendL(a1: List<A>, a2: List<A>): List<A> = foldLeft(a1, a2) { tl, a -> Cons(a, tl) }
+        fun <A> appendR(a1: List<A>, a2: List<A>): List<A> = foldRight(a1,a2) { h, nt -> Cons(h, nt) }
+
+
         fun <A> init(l: List<A>): List<A> =
             when (l) {
                 is Cons ->
@@ -47,6 +63,18 @@ sealed class List<out A> {
                 is Nil ->
                     throw IllegalStateException("Cannot init Nil list")
             }
+
+        tailrec fun <A, B> foldLeft(xs: List<A>, z: B, f: (B, A) -> B): B {
+            return when(xs) {
+                is Nil -> z
+                is Cons -> foldLeft(xs.tail, f(z, xs.head), f)
+            }
+        }
+
+        fun sum3(ints: List<Int>): Int = foldLeft(ints, 0) { b, a -> b + a}
+        fun product3(dbs: List<Double>): Double = foldLeft(dbs, 1.0) { b, a -> b * a}
+
+        fun <A> revert(ls: List<A>) : List<A> = foldLeft(ls, empty()) { tail, head -> Cons(head, tail)}
 
         fun <A, B> foldRight(xs: List<A>, z: B, f: (A, B) -> B): B =
             when (xs) {
@@ -63,11 +91,53 @@ sealed class List<out A> {
         fun <A> length(xs: List<A>): Int =
             foldRight(xs, 0) {_,b -> 1 + b}
 
+        fun <A, B> foldLeftR(xs: List<A>, z: B, f: (B, A) -> B): B =
+            foldRight(xs, { b: B -> b })
+                { a, g -> { b -> g(f(b, a)) } }(z)
+
+        fun <A, B> foldRightL(xs: List<A>, z: B, f: (A, B) -> B): B =
+            foldLeft(xs,
+                { b: B -> b },
+                { g, a ->
+                    { b ->
+                        g(f(a, b))
+                    }
+                })(z)
+
+        fun <A> filter(xs: List<A>, f: (A) -> Boolean): List<A> =
+            foldRight(xs, empty()) { h, nl -> if (f(h)) Cons(h, nl) else nl }
+
+        fun <A, B> map(xs: List<A>, f: (A) -> B): List<B> =
+            foldRight(xs, empty()) { h, nl -> Cons(f(h), nl) }
+
+        fun <A, B> flatMap(xa: List<A>, f: (A) -> List<B>): List<B> =
+            concat( map(xa, f) )
+
+        fun intAdd(xa: List<Int>, xb: List<Int>) : List<Int> = zipWith(xa, xb) { a, b -> a + b}
+
+
+        fun <A> zipWith(xa: List<A>, xb: List<A>, f: (A, A) -> A) : List<A> =
+            when(xa) {
+                is Nil -> Nil
+                is Cons -> when(xb) {
+                    is Nil -> Nil
+                    is Cons -> Cons(f(xa.head,xb.head), zipWith(xa.tail, xb.tail, f))
+                }
+            }
 
     }
+
+    fun add1(ls: List<Int>) : List<Int> =
+        foldRight(ls, empty()) {a , nl -> Cons(a+1, nl)}
 
 }
 
 
 object Nil : List<Nothing>()
 data class Cons<out A>(val head: A, val tail: List<A>) : List<A>()
+
+// Extensions
+fun <A> List<A>.filter(f: (A) -> Boolean) = List.filter(this, f)
+fun <A, B> List<A>.map(f: (A) -> B) = List.map(this, f)
+fun <A, B> List<A>.flatMap(f: (A) -> List<B>) = List.flatMap(this, f)
+fun <A> List<A>.zipWith(ls: List<A>, f: (A, A) -> A) = List.zipWith(this, ls, f)
