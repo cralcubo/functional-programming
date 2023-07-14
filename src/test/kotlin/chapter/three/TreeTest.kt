@@ -3,6 +3,7 @@ package chapter.three
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import kotlin.collections.List
 
 class TreeTest {
     @Test

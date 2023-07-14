@@ -141,3 +141,7 @@ fun <A> List<A>.filter(f: (A) -> Boolean) = List.filter(this, f)
 fun <A, B> List<A>.map(f: (A) -> B) = List.map(this, f)
 fun <A, B> List<A>.flatMap(f: (A) -> List<B>) = List.flatMap(this, f)
 fun <A> List<A>.zipWith(ls: List<A>, f: (A, A) -> A) = List.zipWith(this, ls, f)
+fun <A, B> List<A>.foldRight(z: B, f: (A, B) -> B): B = when (this) {
+    is Nil -> z
+    is Cons -> f(this.head, foldRight(this.tail, z, f))
+}
