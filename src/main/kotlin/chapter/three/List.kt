@@ -145,3 +145,5 @@ fun <A, B> List<A>.foldRight(z: B, f: (A, B) -> B): B = when (this) {
     is Nil -> z
     is Cons -> f(this.head, foldRight(this.tail, z, f))
 }
+
+fun <A> List<A>.revert() = List.revert(this)
