@@ -1,6 +1,8 @@
 package chapter.three
 
-import chapter.three.List.Companion.empty
+import chapter.four.None
+import chapter.four.Option
+import chapter.four.Some
 import chapter.three.List.Companion.foldRight
 import java.lang.RuntimeException
 
@@ -147,3 +149,21 @@ fun <A, B> List<A>.foldRight(z: B, f: (A, B) -> B): B = when (this) {
 }
 
 fun <A> List<A>.revert() = List.revert(this)
+
+fun <A> List<A>.first() =
+    when (this) {
+        is Nil -> None
+        is Cons -> Some(this.head)
+    }
+fun <A> List<A>.last() : Option<A> {
+    tailrec fun go(ls: List<A>, last: A): A {
+        return when(ls) {
+            is Nil -> last
+            is Cons -> go(ls.tail, ls.head)
+        }
+    }
+    return when(this) {
+        is Nil -> None
+        is Cons -> Some(go(this.tail, this.head))
+    }
+}

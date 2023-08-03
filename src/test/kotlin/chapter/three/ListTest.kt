@@ -1,7 +1,7 @@
 package chapter.three
 
+import chapter.four.getOrElse
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class ListTest {
@@ -46,5 +46,19 @@ class ListTest {
         List.intAdd(lsa, lsb) shouldBe List.of(2,4,6)
     }
 
-}
+    @Test
+    fun first() {
+        val ls = List.of(1, 2, 3, 4)
+        ls.first().getOrElse { 0 } shouldBe 1
+        Nil.first().getOrElse { 0 } shouldBe 0
+    }
 
+    @Test
+    fun last() {
+        val ls = List.of(1, 2, 3, 4)
+        ls.last().getOrElse { 0 } shouldBe 4
+        Nil.last().getOrElse { 0 } shouldBe 0
+
+    }
+
+}
