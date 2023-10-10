@@ -10,3 +10,10 @@ fun <E> List<E>.splitAt(i: Int): Pair<List<E>, List<E>> {
 
 fun <E> List<E>.firstOption(): Option<E> =
     this.firstOrNull()?.let { Some(it) } ?: Option.empty()
+
+val <T> List<T>.head: T
+    get() = first()
+
+val <T> List<T>.tail: List<T>
+    get() = this.drop(1)
+
