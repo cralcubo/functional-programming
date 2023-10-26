@@ -1,7 +1,6 @@
 package chapter.seven
 
 import chapter.seven.OldPar.Companion.fork
-import chapter.six.unit
 import org.junit.jupiter.api.Test
 
 class ParTest {
@@ -17,13 +16,6 @@ class ParTest {
 //        fork shouldBe par
     }
 
-    @Test
-    fun unit() {
-        val p = unit {
-            println("Instantiated!!!")
-            42
-        }
-    }
 
 }
 

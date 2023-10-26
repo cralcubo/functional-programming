@@ -19,6 +19,16 @@ sealed class List<out A> {
             }
         }
 
+        fun <A> gen(size: Int, z: A,  f: (A) -> A) : List<A> {
+            tailrec fun acc(n: Int, z: A, ls: List<A>) : List<A> {
+                return if(n > 0) {
+                    acc(n-1, f(z), Cons(z, ls))
+                } else ls
+            }
+
+            return acc(size, z,  Nil).revert()
+        }
+
         fun <A> concat(xxs: List<List<A>>): List<A> =
             foldRight(
                 xxs,
@@ -149,6 +159,8 @@ fun <A, B> List<A>.foldRight(z: B, f: (A, B) -> B): B = when (this) {
 }
 
 fun <A> List<A>.revert() = List.revert(this)
+
+fun <A> List<A>.size() = this.foldRight(0){ _, x -> x + 1 }
 
 fun <A> List<A>.first() =
     when (this) {

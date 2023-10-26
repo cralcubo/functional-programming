@@ -30,12 +30,12 @@ val intR: Rand<Int> = State { rng -> rng.nextInt() }
 val nonNegativeInt: Rand<Int> = State {rng -> nonNegativeInt(rng) }
 val doubleR: Rand<Double> = map(nonNegativeInt) { it / (Int.MAX_VALUE.toDouble() + 1) }
 
-fun <A> unit(a: A): Rand<A> = State.unit(a)
+//fun <A> unit(a: A): Rand<A> = State.unit(a)
 
 
 fun <A, B> flatMap(f: Rand<A>, g: (A) -> Rand<B>): Rand<B> = f.flatMap{a -> g(a)}
 fun <A, B> mapFM(s: Rand<A>, f: (A) -> B): Rand<B> =
-    flatMap(s) { unit(f(it)) }
+    flatMap(s) { State.unit(f(it)) }
 
 fun <A, B> map(s: Rand<A>, f: (A) -> B): Rand<B> = s.map(f)
 
@@ -69,12 +69,12 @@ fun nonNegativeIntLessThan(n: Int): Rand<Int> =
 fun nonNegativeIntLessThan2(n: Int): Rand<Int> =
     flatMap(nonNegativeInt) { i ->
         val mod = i % n
-        if (i + (n - 1) - mod >= 0) unit(mod)
+        if (i + (n - 1) - mod >= 0) State.unit(mod)
         else nonNegativeIntLessThan2(n)
     }
 
 fun <A> sequence(fs: List<Rand<A>>): Rand<List<A>> =
-    fs.foldRight(unit(List.empty())) { f, acc -> map2(f, acc) { h, t -> Cons(h, t) } }
+    fs.foldRight(State.unit(List.empty())) { f, acc -> map2(f, acc) { h, t -> Cons(h, t) } }
 
 fun <A, B> both(ra: Rand<A>, rb: Rand<B>): Rand<Pair<A, B>> =
     map2(ra, rb) { a, b -> a to b }

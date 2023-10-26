@@ -1,8 +1,10 @@
 package chapter.six
 
+import chapter.six.State.Companion.map2
 import chapter.six.State.Companion.unit
 import chapter.three.Cons
 import chapter.three.List
+import chapter.three.foldRight
 
 data class State<S, out A>(val run: (S) -> Pair<A, S>) {
     companion object {
@@ -12,8 +14,8 @@ data class State<S, out A>(val run: (S) -> Pair<A, S>) {
             sa.flatMap { a -> sb.map { b -> f(a, b) } }
 
         fun <S, A> sequence(fs: List<State<S, A>>): State<S, List<A>> =
-            List.foldRight(fs, unit(List.empty())) { f, acc ->
-                map2(f, acc) { h, t -> Cons(h, t) }
+            fs.foldRight(unit(List.empty())) { sa, slb ->
+                map2(sa,slb) { h,t -> Cons(h,t) }
             }
 
     }

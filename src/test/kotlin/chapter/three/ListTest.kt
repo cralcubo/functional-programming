@@ -7,6 +7,29 @@ import org.junit.jupiter.api.Test
 class ListTest {
 
     @Test
+    fun genOne() {
+        List.gen(3, 1) { it } shouldBe List.of(1,1,1)
+    }
+
+    @Test
+    fun genSec() {
+        List.gen(3, 0) { it + 1 } shouldBe List.of(0, 1, 2)
+    }
+
+    @Test
+    fun fib() {
+        // 0 1 1 2 3 5 8 13
+        List.gen(15, Pair(0, 1)) { Pair(it.second + it.first, it.first + it.second + it.second) }
+            .flatMap { List.of(it.first, it.second) }.last().getOrElse { 0 } shouldBe 514229
+    }
+
+    @Test
+    fun size() {
+        List.of(1,2,3,4,5).size() shouldBe 5
+    }
+
+
+    @Test
     fun drop() {
         val ls = List.of(1, 2, 3, 4)
         List.drop(ls, 2) shouldBe List.of(3, 4)
