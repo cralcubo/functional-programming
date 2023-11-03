@@ -5,10 +5,17 @@ import chapter.three.Cons
 import chapter.three.List
 import chapter.three.foldRight
 import kotlin.math.absoluteValue
+import kotlin.math.max
 
 data class Gen<A>(val sample: State<RNG, A>) {
     fun unsized(): SGen<A> = SGen { this }
-    fun listOf(): SGen<List<A>> = TODO()
+    fun listOf(): SGen<List<A>> = SGen { n ->
+        listOfN2(n, this)
+    }
+    fun nonEmptyList() : SGen<List<A>> = SGen { n ->
+        listOfN2(max(1,n), this)
+    }
+
 
     companion object {
 
@@ -37,13 +44,13 @@ data class Gen<A>(val sample: State<RNG, A>) {
                 map2(ga, gla) { a, la -> Cons(a, la) }
             }
 
-        fun <A> listOfN(n: Int, ga: Gen<A>): Gen<List<A>> {
-            val sequence = State.sequence(List.gen(n, ga.sample) { it })
+        fun <A> listOfN2(n: Int, ga: Gen<A>): Gen<List<A>> {
+            val sequence = State.sequence(List.generateList(n, ga.sample) { it })
             return Gen(sequence)
         }
 
-        fun <A> listOfN2(gn: Gen<Int>, ga: Gen<A>) =
-            gn.flatMap { n -> sequence(List.gen(n, ga) { it }) }
+        fun <A> listOfN(gn: Gen<Int>, ga: Gen<A>) =
+            gn.flatMap { n -> sequence(List.generateList(n, ga) { it }) }
     }
 }
 

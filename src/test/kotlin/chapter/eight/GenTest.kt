@@ -1,5 +1,6 @@
 package chapter.eight
 
+import chapter.eight.Gen.Companion.listOfN
 import chapter.eight.Gen.Companion.listOfN2
 import chapter.eight.Gen.Companion.sequence
 import chapter.eight.Gen.Companion.union
@@ -18,7 +19,7 @@ class GenTest {
         val ga = Gen.unit(5)
         val gb = Gen.unit(10)
         val gc = Gen.union(ga, gb)
-        val gc2 = Gen.union2(ga,gb)
+        val gc2 = Gen.union(ga,gb)
 
         val pair = gc.sample.run(SimpleRNG(1))
         println(pair)
@@ -49,7 +50,7 @@ class GenTest {
 
     @Test
     fun list() {
-        val listGen = Gen.listOfN(3, choose(0, 1000))
+        val listGen = Gen.listOfN2(3, choose(0, 1000))
         val rng = SimpleRNG(10)
         val pair = listGen.sample.run(rng)
         println(pair)
@@ -60,7 +61,7 @@ class GenTest {
 
     @Test
     fun list2() {
-        val listOfN2 = listOfN2(unit(3), choose(0, 1000))
+        val listOfN2 = listOfN(unit(3), choose(0, 1000))
         val rng = SimpleRNG(10)
         val pair = listOfN2.sample.run(rng)
         println(pair)
@@ -71,7 +72,7 @@ class GenTest {
 
     @Test
     fun list3() {
-        val listOfN2 = listOfN2(unit(3), Gen(State.unit("casa")))
+        val listOfN2 = listOfN(unit(3), Gen(State.unit("casa")))
         val rng = SimpleRNG(10)
         val pair = listOfN2.sample.run(rng)
         println(pair)

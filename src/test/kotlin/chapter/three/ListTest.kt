@@ -7,19 +7,39 @@ import org.junit.jupiter.api.Test
 class ListTest {
 
     @Test
+    fun existsCond() {
+        val ls = List.of(1,2,3,4)
+        ls.exists { it > 10 } shouldBe false
+        ls.exists { it < 10 } shouldBe true
+    }
+
+    @Test
+    fun exists() {
+        val ls = List.of(1,2,3,4)
+        ls.exists(4) shouldBe true
+        ls.exists(10) shouldBe false
+    }
+
+    @Test
+    fun max() {
+        val ls = List.of(-1,-200,-3,-100)
+        ls.max() shouldBe -1
+    }
+
+    @Test
     fun genOne() {
-        List.gen(3, 1) { it } shouldBe List.of(1,1,1)
+        List.generateList(3, 1) { it } shouldBe List.of(1,1,1)
     }
 
     @Test
     fun genSec() {
-        List.gen(3, 0) { it + 1 } shouldBe List.of(0, 1, 2)
+        List.generateList(3, 0) { it + 1 } shouldBe List.of(0, 1, 2)
     }
 
     @Test
     fun fib() {
         // 0 1 1 2 3 5 8 13
-        List.gen(15, Pair(0, 1)) { Pair(it.second + it.first, it.first + it.second + it.second) }
+        List.generateList(15, Pair(0, 1)) { Pair(it.second + it.first, it.first + it.second + it.second) }
             .flatMap { List.of(it.first, it.second) }.last().getOrElse { 0 } shouldBe 514229
     }
 

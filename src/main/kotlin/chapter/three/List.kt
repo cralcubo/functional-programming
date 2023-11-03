@@ -11,6 +11,7 @@ import java.lang.RuntimeException
  * This linked list is an Algebraic Data Structure
  */
 sealed class List<out A> {
+
     companion object {
         fun <A> of(vararg aa: A): List<A> {
             return when {
@@ -19,14 +20,14 @@ sealed class List<out A> {
             }
         }
 
-        fun <A> gen(size: Int, z: A,  f: (A) -> A) : List<A> {
+        fun <A> generateList(size: Int, seed: A, nextGenerator: (A) -> A) : List<A> {
             tailrec fun acc(n: Int, z: A, ls: List<A>) : List<A> {
                 return if(n > 0) {
-                    acc(n-1, f(z), Cons(z, ls))
+                    acc(n-1, nextGenerator(z), Cons(z, ls))
                 } else ls
             }
 
-            return acc(size, z,  Nil).revert()
+            return acc(size, seed,  Nil).revert()
         }
 
         fun <A> concat(xxs: List<List<A>>): List<A> =
@@ -142,6 +143,7 @@ sealed class List<out A> {
     fun add1(ls: List<Int>) : List<Int> =
         foldRight(ls, empty()) {a , nl -> Cons(a+1, nl)}
 
+
 }
 
 
@@ -180,4 +182,21 @@ fun <A> List<A>.last() : Option<A> {
     }
 }
 
+fun List<Int>.max() : Int =
+    when(this) {
+        is Nil -> throw IllegalStateException("The element with the MAX value was tried to be determined from an empty list")
+        is Cons -> this.foldRight(this.head) { a, b -> if(a >= b) a else b }
+    }
+
+fun<A> List<A>.exists(a: A) : Boolean =
+    when(this) {
+        is Nil -> false
+        is Cons -> if(a == this.head) true else tail.exists(a)
+    }
+
+fun  List<Int>.exists(cond: (Int) -> Boolean) : Boolean =
+    when(this) {
+        is Nil -> false
+        is Cons -> if(cond(this.head)) true else this.tail.exists(cond)
+    }
 
