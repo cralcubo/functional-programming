@@ -2,9 +2,11 @@ package chapter.three
 
 import chapter.four.getOrElse
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.TestResult
 import org.junit.jupiter.api.Test
 
 class ListTest {
+
 
     @Test
     fun existsCond() {
@@ -102,6 +104,42 @@ class ListTest {
         ls.last().getOrElse { 0 } shouldBe 4
         Nil.last().getOrElse { 0 } shouldBe 0
 
+    }
+
+    @Test
+    fun splitEven() {
+        val ls = List.of(1, 2, 3, 4)
+        List.split(ls) shouldBe Pair(List.of(2,1), List.of(3,4))
+    }
+
+    @Test
+    fun splitOdd() {
+        val ls = List.of(1, 2, 3, 4, 5)
+        List.split(ls) shouldBe Pair(List.of(2,1), List.of(3,4,5))
+    }
+
+    @Test
+    fun splitEmpty() {
+        val ls = List.empty<Int>()
+        List.split(ls) shouldBe Pair(List.empty(), List.empty())
+    }
+
+    @Test
+    fun splitUnitary() {
+        val ls = List.of(1)
+        List.split(ls) shouldBe Pair(List.empty(), List.of(1))
+    }
+
+    @Test
+    fun ordered() {
+        val ls = List.of(1, 2, 30, 40, 500)
+        ordered(ls) shouldBe true
+    }
+
+    @Test
+    fun disordered() {
+        val ls = List.of(1, 2, 3, 40, 5)
+        ordered(ls) shouldBe false
     }
 
 }

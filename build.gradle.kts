@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.9.20"
     application
 }
 
@@ -13,10 +13,11 @@ repositories {
 dependencies {
     implementation("io.arrow-kt:arrow-core:1.2.0")
     implementation("io.arrow-kt:arrow-fx-coroutines:1.2.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
-    testImplementation(kotlin("test"))
-    testImplementation("io.kotest:kotest-runner-junit5:5.6.2")
-
+    implementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
 }
 
 tasks.test {

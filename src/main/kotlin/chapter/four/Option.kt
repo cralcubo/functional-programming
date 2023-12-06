@@ -20,6 +20,9 @@ sealed class Option<out A> {
 
     companion object{
         fun<A> empty(): Option<A> = None
+
+        fun <A, B, C> map2(a: Option<A>, b: Option<B>, f: (A, B) -> C): Option<C> =
+        a.flatMap { x -> b.map { y -> f(x,y) } }
     }
 
 }

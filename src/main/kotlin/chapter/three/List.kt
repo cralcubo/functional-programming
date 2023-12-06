@@ -1,10 +1,11 @@
 package chapter.three
 
-import chapter.four.None
-import chapter.four.Option
-import chapter.four.Some
+import chapter.four.*
+import chapter.ten.Monoid
+import chapter.three.List.Companion.foldMap
 import chapter.three.List.Companion.foldRight
-import java.lang.RuntimeException
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * This a simple Linked List data structure
@@ -35,6 +36,9 @@ sealed class List<out A> {
                 xxs,
                 empty()
             ) { xs1, xs2 -> append(xs1, xs2) }
+
+        fun <A> concatenate(la: List<A>, m: Monoid<A>): A =
+            foldLeft(la, m.nil, m::combine)
 
         fun <A> empty(): List<A> = Nil
 
@@ -103,6 +107,29 @@ sealed class List<out A> {
 
         fun <A> length(xs: List<A>): Int =
             foldRight(xs, 0) {_,b -> 1 + b}
+
+        fun <A, B> foldMap(la: List<A>, m: Monoid<B>, f: (A) -> B): B =
+            foldLeft(la, m.nil) { b, a -> m.combine(b, f(a))}
+
+        fun <A, B> foldMapBalanced(la: List<A>, m: Monoid<B>, f: (A) -> B): B {
+            val (l1,l2) = split(la)
+            return  m.combine(foldMap(l1, m, f), foldMap(l2, m, f))
+        }
+
+        fun <A> split(la: List<A>) : Pair<List<A>, List<A>> {
+            val s = la.size()
+            fun acc(i: Int, l: List<A>, acc: List<A>) : Pair<List<A>, List<A>> {
+                if(i == s/2 ) return acc to l
+                return when(l) {
+                    is Nil -> throw RuntimeException("Cannot split empty list")
+                    is Cons -> acc(i+1, l.tail, Cons(l.head, acc))
+                }
+            }
+
+            return acc(0, la, empty())
+        }
+
+
 
         fun <A, B> foldLeftR(xs: List<A>, z: B, f: (B, A) -> B): B =
             foldRight(xs, { b: B -> b })
@@ -200,3 +227,34 @@ fun  List<Int>.exists(cond: (Int) -> Boolean) : Boolean =
         is Cons -> if(cond(this.head)) true else this.tail.exists(cond)
     }
 
+typealias TrackingState = Triple<Int, Int, Boolean>
+
+val monoid = object : Monoid<Option<TrackingState>> {
+    override fun combine(
+        a1: Option<TrackingState>,
+        a2: Option<TrackingState>
+    ): Option<TrackingState> =
+        when (a1) {
+            is None -> a2
+            is Some ->
+                when (a2) {
+                    is None -> a1
+                    is Some -> Some(
+                        Triple(
+                            first = min(a1.get.first, a2.get.first),
+                            second = max(a1.get.second, a2.get.second),
+                            third = a1.get.third &&
+                                    a2.get.third &&
+                                    a1.get.second <= a2.get.first
+                        )
+                    )
+                }
+        }
+
+    override val nil: Option<TrackingState> = None
+}
+
+fun ordered(ints: List<Int>): Boolean =
+    foldMap(ints, monoid) { i: Int -> Some(TrackingState(i, i, true)) }
+        .map { it.third }
+        .getOrElse { true }
